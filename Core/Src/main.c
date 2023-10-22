@@ -95,15 +95,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    float coordinates[3] = BSP_GYRO_GetXYZ();
-    uint8_t buffer[20];
+    float coordinates[3];
+    BSP_GYRO_GetXYZ(coordinates);
+    char *buffer = NULL;
     BSP_LCD_Clear(LCD_COLOR_WHITE);
     sprintf(buffer, "x: %f", coordinates[0]);
-    BSP_LCD_DisplayStringAtLine(0, buffer);
+    BSP_LCD_DisplayStringAtLine(0, (uint8_t*)buffer);
     sprintf(buffer, "y: %f", coordinates[1]);
-    BSP_LCD_DisplayStringAtLine(1, buffer);
+    BSP_LCD_DisplayStringAtLine(1, (uint8_t*)buffer);
     sprintf(buffer, "z: %f", coordinates[2]);
-    BSP_LCD_DisplayStringAtLine(2, buffer);
+    BSP_LCD_DisplayStringAtLine(2, (uint8_t*)buffer);
     HAL_Delay(50);
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
