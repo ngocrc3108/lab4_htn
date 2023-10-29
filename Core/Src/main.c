@@ -87,8 +87,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  BSP_LCD_Init();
   BSP_GYRO_Init();
+  BSP_LCD_Init();
+  BSP_LCD_LayerDefaultInit(1, SDRAM_DEVICE_ADDR);
+  BSP_LCD_SelectLayer(1);//select on which layer we write
+  BSP_LCD_DisplayOn();//turn on LCD
+  BSP_LCD_Clear(LCD_COLOR_BLUE);//clear the LCD on blue color
+  BSP_LCD_SetBackColor(LCD_COLOR_BLUE);//set text background color
+  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -98,7 +104,7 @@ int main(void)
     float coordinates[3];
     BSP_GYRO_GetXYZ(coordinates);
     char *buffer = NULL;
-    BSP_LCD_Clear(LCD_COLOR_WHITE);
+    //BSP_LCD_Clear(LCD_COLOR_WHITE);
     sprintf(buffer, "x: %f", coordinates[0]);
     BSP_LCD_DisplayStringAtLine(0, (uint8_t*)buffer);
     sprintf(buffer, "y: %f", coordinates[1]);
