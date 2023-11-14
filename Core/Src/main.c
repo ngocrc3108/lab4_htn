@@ -92,7 +92,6 @@ int main(void)
   BSP_LCD_LayerDefaultInit(1, SDRAM_DEVICE_ADDR);
   BSP_LCD_SelectLayer(1);//select on which layer we write
   BSP_LCD_DisplayOn();//turn on LCD
-  BSP_LCD_Clear(LCD_COLOR_BLUE);//clear the LCD on blue color
   BSP_LCD_SetBackColor(LCD_COLOR_BLUE);//set text background color
   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
   /* USER CODE END 2 */
@@ -103,15 +102,15 @@ int main(void)
   {
     float coordinates[3];
     BSP_GYRO_GetXYZ(coordinates);
-    char *buffer = NULL;
-    //BSP_LCD_Clear(LCD_COLOR_WHITE);
+    char buffer[20] = "";
+    BSP_LCD_Clear(LCD_COLOR_BLUE);
     sprintf(buffer, "x: %f", coordinates[0]);
     BSP_LCD_DisplayStringAtLine(0, (uint8_t*)buffer);
     sprintf(buffer, "y: %f", coordinates[1]);
     BSP_LCD_DisplayStringAtLine(1, (uint8_t*)buffer);
     sprintf(buffer, "z: %f", coordinates[2]);
     BSP_LCD_DisplayStringAtLine(2, (uint8_t*)buffer);
-    HAL_Delay(50);
+    HAL_Delay(100);
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }
