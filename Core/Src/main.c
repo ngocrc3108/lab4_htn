@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32f429i_discovery_lcd.h"
+#include "stm32f429i_discovery_gyroscope.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -73,7 +75,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -86,26 +87,32 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  BSP_LCD_Init();//init LCD
-  //set the layer buffer address into SDRAM
+  BSP_GYRO_Init();
+  BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(1, SDRAM_DEVICE_ADDR);
   BSP_LCD_SelectLayer(1);//select on which layer we write
   BSP_LCD_DisplayOn();//turn on LCD
   BSP_LCD_Clear(LCD_COLOR_BLUE);//clear the LCD on blue color
   BSP_LCD_SetBackColor(LCD_COLOR_BLUE);//set text background color
-  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);//set text color
-  //write text
-  BSP_LCD_DisplayStringAtLine(2,(uint8_t*)&"Cube STM32");
-  BSP_LCD_DisplayStringAtLine(3,(uint8_t*)&"BSP");
-  BSP_LCD_DisplayStringAtLine(4,(uint8_t*)&"LCD DEMO");
+  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    float coordinates[3];
+    BSP_GYRO_GetXYZ(coordinates);
+    char buffer[20] = "";
+    BSP_LCD_Clear(LCD_COLOR_BLUE);
+    sprintf(buffer, "x: %f", coordinates[0]);
+    BSP_LCD_DisplayStringAtLine(0, (uint8_t*)buffer);
+    sprintf(buffer, "y: %f", coordinates[1]);
+    BSP_LCD_DisplayStringAtLine(1, (uint8_t*)buffer);
+    sprintf(buffer, "z: %f", coordinates[2]);
+    BSP_LCD_DisplayStringAtLine(2, (uint8_t*)buffer);
+    HAL_Delay(100);
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
