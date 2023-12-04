@@ -92,6 +92,7 @@ int main(void)
   BSP_LCD_LayerDefaultInit(1, SDRAM_DEVICE_ADDR);
   BSP_LCD_SelectLayer(1);//select on which layer we write
   BSP_LCD_DisplayOn();//turn on LCD
+  BSP_LCD_Clear(LCD_COLOR_BLUE);//clear the LCD on blue color
   BSP_LCD_SetBackColor(LCD_COLOR_BLUE);//set text background color
   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
   /* USER CODE END 2 */
