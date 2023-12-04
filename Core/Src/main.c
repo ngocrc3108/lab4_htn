@@ -33,6 +33,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SAMPLE_PERIOD_MS 30 // ms
+#define LCD_WIDTH 240
+#define LCD_HEIGHT 320
+#define TRIANGLE_LENGTH 20
+#define TRIANGLE_HEIGHT 16 // ~~ 20sin(60)
 
 /* USER CODE END PD */
 
@@ -87,31 +92,52 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  BSP_GYRO_Init();
+  BSP_GYRO_Init(); // L3GD20_FULLSCALE_500
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(1, SDRAM_DEVICE_ADDR);
   BSP_LCD_SelectLayer(1);//select on which layer we write
   BSP_LCD_DisplayOn();//turn on LCD
-  BSP_LCD_Clear(LCD_COLOR_BLUE);//clear the LCD on blue color
-  BSP_LCD_SetBackColor(LCD_COLOR_BLUE);//set text background color
-  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+  BSP_LCD_Clear(LCD_COLOR_WHITE);//clear the LCD on white color
+  BSP_LCD_SetBackColor(LCD_COLOR_WHITE);//set text background color
+  BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+  float gyroXangle = 0, gyroYangle = 0; // gyroZangle = 0;
   /* USER CODE END 2 */
+
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    float coordinates[3];
-    BSP_GYRO_GetXYZ(coordinates);
-    char buffer[20] = "";
-    BSP_LCD_Clear(LCD_COLOR_BLUE);
-    sprintf(buffer, "x: %f", coordinates[0]);
-    BSP_LCD_DisplayStringAtLine(0, (uint8_t*)buffer);
-    sprintf(buffer, "y: %f", coordinates[1]);
-    BSP_LCD_DisplayStringAtLine(1, (uint8_t*)buffer);
-    sprintf(buffer, "z: %f", coordinates[2]);
-    BSP_LCD_DisplayStringAtLine(2, (uint8_t*)buffer);
-    HAL_Delay(100);
+    float rawData[3];
+    BSP_GYRO_GetXYZ(rawData);
+    for(uint8_t i = 0; i < 3; i++) {
+        // Convert Gyro raw to degrees per second, L3GD20_FULLSCALE_500
+    	rawData[i] = rawData[i]*0.01750;
+    }
+    gyroXangle = rawData[0] * SAMPLE_PERIOD_MS / 1000;
+    gyroYangle = rawData[1] * SAMPLE_PERIOD_MS / 1000;
+    //gyroZangle = rawData[2] * SAMPLE_PERIOD_MS / 1000;
+    BSP_LCD_Clear(LCD_COLOR_WHITE);
+    if(gyroXangle >= 0) {
+    	// draw top triangle
+    	BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
+    			5 + TRIANGLE_HEIGHT,5 , 5 + TRIANGLE_HEIGHT);
+    } else {
+    	// draw bottom triangle
+    	BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
+    		LCD_HEIGHT - 5 - TRIANGLE_HEIGHT, LCD_HEIGHT - 5, LCD_HEIGHT - 5 - TRIANGLE_HEIGHT);
+    }
+    if(gyroYangle >= 0) {
+    	// draw right triangle
+    	BSP_LCD_FillTriangle(LCD_WIDTH - 5 - TRIANGLE_HEIGHT, LCD_WIDTH - 5 - TRIANGLE_HEIGHT, LCD_WIDTH - 5,
+    						LCD_HEIGHT/2 - TRIANGLE_LENGTH/2, LCD_HEIGHT/2 + TRIANGLE_LENGTH/2, LCD_HEIGHT/2);
+    } else {
+    	// draw left triangle
+    	BSP_LCD_FillTriangle(5, TRIANGLE_HEIGHT + 5, TRIANGLE_HEIGHT + 5,
+    			LCD_HEIGHT/2, LCD_HEIGHT/2 - TRIANGLE_LENGTH/2, LCD_HEIGHT/2 + TRIANGLE_LENGTH/2);
+    }
+    HAL_Delay(SAMPLE_PERIOD_MS);
+
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }
