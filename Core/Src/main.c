@@ -264,11 +264,7 @@ void StartGyroSample(void *argument)
 	zAngle += rawData[2] * SAMPLE_PERIOD_MS / 1000.0;
 
 	char stringBuf[100];
-
 	sprintf(stringBuf, "xAngle: %f\nyAngle: %f\nyAngle: %f", xAngle, yAngle, zAngle);
-
-
-
 	CDC_Transmit_FS((uint8_t*)stringBuf, strlen(stringBuf));
 
 	osDelay(SAMPLE_PERIOD_MS); // tan so lay mau la 100 Hz
