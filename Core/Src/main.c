@@ -18,12 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32f429i_discovery_lcd.h"
 #include "stm32f429i_discovery_gyroscope.h"
 #include "stdio.h"
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -91,6 +93,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
   BSP_GYRO_Init(); // L3GD20_FULLSCALE_500
   BSP_LCD_Init();
@@ -100,9 +103,8 @@ int main(void)
   BSP_LCD_Clear(LCD_COLOR_WHITE);//clear the LCD on white color
   BSP_LCD_SetBackColor(LCD_COLOR_WHITE);//set text background color
   BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-  float gyroXangle = 0, gyroYangle = 0; // gyroZangle = 0;
+  float xAngle = 0, yAngle = 0, zAngle = 0;
   /* USER CODE END 2 */
-
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -114,11 +116,17 @@ int main(void)
         // Convert Gyro raw to degrees per second, L3GD20_FULLSCALE_500
     	rawData[i] = rawData[i]*0.01750;
     }
-    gyroXangle = rawData[0] * SAMPLE_PERIOD_MS / 1000;
-    gyroYangle = rawData[1] * SAMPLE_PERIOD_MS / 1000;
-    //gyroZangle = rawData[2] * SAMPLE_PERIOD_MS / 1000;
+    xAngle = rawData[0] * SAMPLE_PERIOD_MS / 1000;
+    yAngle = rawData[1] * SAMPLE_PERIOD_MS / 1000;
+    zAngle = rawData[2] * SAMPLE_PERIOD_MS / 1000;
+
+    char stringBuf[100];
+
+    sprintf(stringBuf, "xAngle: %f\nyAngle: %f\nyAngle: %f", xAngle, yAngle, zAngle);
+
+    //zAngle = rawData[2] * SAMPLE_PERIOD_MS / 1000;
     BSP_LCD_Clear(LCD_COLOR_WHITE);
-    if(gyroXangle >= 0) {
+    if(xAngle >= 0) {
     	// draw top triangle
     	BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
     			5 + TRIANGLE_HEIGHT,5 , 5 + TRIANGLE_HEIGHT);
@@ -127,7 +135,7 @@ int main(void)
     	BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
     		LCD_HEIGHT - 5 - TRIANGLE_HEIGHT, LCD_HEIGHT - 5, LCD_HEIGHT - 5 - TRIANGLE_HEIGHT);
     }
-    if(gyroYangle >= 0) {
+    if(yAngle >= 0) {
     	// draw right triangle
     	BSP_LCD_FillTriangle(LCD_WIDTH - 5 - TRIANGLE_HEIGHT, LCD_WIDTH - 5 - TRIANGLE_HEIGHT, LCD_WIDTH - 5,
     						LCD_HEIGHT/2 - TRIANGLE_LENGTH/2, LCD_HEIGHT/2 + TRIANGLE_LENGTH/2, LCD_HEIGHT/2);
@@ -139,6 +147,7 @@ int main(void)
     HAL_Delay(SAMPLE_PERIOD_MS);
 
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -166,17 +175,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 360;
+  RCC_OscInitStruct.PLL.PLLN = 336;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Activate the Over-Drive mode
-  */
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -208,6 +210,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
