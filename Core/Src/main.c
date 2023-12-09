@@ -123,6 +123,7 @@ int main(void)
     char stringBuf[100];
 
     sprintf(stringBuf, "xAngle: %f\nyAngle: %f\nyAngle: %f", xAngle, yAngle, zAngle);
+    CDC_Transmit_FS((uint8_t*)stringBuf, strlen(stringBuf));
 
     //zAngle = rawData[2] * SAMPLE_PERIOD_MS / 1000;
     BSP_LCD_Clear(LCD_COLOR_WHITE);
