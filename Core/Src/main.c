@@ -39,8 +39,8 @@
 #define SAMPLE_PERIOD_MS 10 // ms
 #define LCD_WIDTH 240
 #define LCD_HEIGHT 320
-#define TRIANGLE_LENGTH 20
-#define TRIANGLE_HEIGHT 16 // ~~ 20sin(60)
+#define TRIANGLE_LENGTH 50
+#define TRIANGLE_HEIGHT 43 // ~~ 20sin(60)
 
 /* USER CODE END PD */
 
@@ -66,6 +66,7 @@ const osThreadAttr_t DisplayLCD_attributes = {
 };
 /* USER CODE BEGIN PV */
 float xAngle = 0, yAngle = 0, zAngle = 0;
+float rawData[3];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -253,7 +254,6 @@ void StartGyroSample(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	float rawData[3];
 	BSP_GYRO_GetXYZ(rawData);
 	for(uint8_t i = 0; i < 3; i++) {
 		// Convert Gyro raw to degrees per second, L3GD20_FULLSCALE_500
@@ -287,13 +287,13 @@ void StartDisplayLCD(void *argument)
   {
 	BSP_LCD_Clear(LCD_COLOR_WHITE);
 	if(xAngle >= 0) {
-		// draw top triangle
-		BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
-				5 + TRIANGLE_HEIGHT, 5, 5 + TRIANGLE_HEIGHT);
-	} else {
 		// draw bottom triangle
 		BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
 			LCD_HEIGHT - 5 - TRIANGLE_HEIGHT, LCD_HEIGHT - 5, LCD_HEIGHT - 5 - TRIANGLE_HEIGHT);
+	} else {
+		// draw top triangle
+		BSP_LCD_FillTriangle(LCD_WIDTH/2 - TRIANGLE_LENGTH/2, LCD_WIDTH/2, LCD_WIDTH/2  + TRIANGLE_LENGTH/2,
+				5 + TRIANGLE_HEIGHT, 5, 5 + TRIANGLE_HEIGHT);
 	}
 	if(yAngle >= 0) {
 		// draw right triangle
